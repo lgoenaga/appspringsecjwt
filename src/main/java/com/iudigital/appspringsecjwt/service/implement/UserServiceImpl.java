@@ -1,6 +1,5 @@
 package com.iudigital.appspringsecjwt.service.implement;
 
-import com.iudigital.appspringsecjwt.dto.request.UserRequest;
 import com.iudigital.appspringsecjwt.model.User;
 import com.iudigital.appspringsecjwt.repository.UserRepository;
 import com.iudigital.appspringsecjwt.service.interfaces.IUserService;

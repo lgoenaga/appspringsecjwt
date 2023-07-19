@@ -40,8 +40,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-
-        return username -> userService.loadUserByUsername(username);
+        return userService;
     }
 
 }

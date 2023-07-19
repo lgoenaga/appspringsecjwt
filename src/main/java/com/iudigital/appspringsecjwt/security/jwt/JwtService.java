@@ -1,6 +1,5 @@
 package com.iudigital.appspringsecjwt.security.jwt;
 
-import com.iudigital.appspringsecjwt.dto.request.UserRequest;
 import com.iudigital.appspringsecjwt.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
