@@ -1,6 +1,5 @@
 package com.iudigital.appspringsecjwt.security.service;
 
-
 import com.iudigital.appspringsecjwt.model.User;
 import com.iudigital.appspringsecjwt.repository.RoleRepository;
 import com.iudigital.appspringsecjwt.repository.UserRepository;
@@ -9,12 +8,10 @@ import com.iudigital.appspringsecjwt.security.dto.request.RegisterRequest;
 import com.iudigital.appspringsecjwt.security.dto.response.AuthResponse;
 import com.iudigital.appspringsecjwt.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +23,11 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
+
     public AuthResponse login(LoginRequest request) {
 
-        UserDetails user = userRepository.findByUsername(request.getUsername());
+        User user = userRepository.findByUsername(request.getUsername());
+
 
         if (user == null) {
             throw new RuntimeException("User not found");

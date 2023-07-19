@@ -41,7 +41,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
 
-        return userService::findByUsername;
+        return username -> userService.loadUserByUsername(username);
     }
 
 }

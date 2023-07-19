@@ -1,6 +1,9 @@
 package com.iudigital.appspringsecjwt.security.jwt;
 
+import com.iudigital.appspringsecjwt.dto.request.UserRequest;
+import com.iudigital.appspringsecjwt.model.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -12,8 +15,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
-
-import  io.jsonwebtoken.Jwts;
+import java.util.Map;
 
 @Service
 public class JwtService {
@@ -24,15 +26,20 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    public String generateToken(UserDetails user) {
+    public String generateToken(User user) {
+
+
         return getToken(new HashMap<>(), user);
     }
 
-    private String getToken(HashMap<String, Object> extraClaims, UserDetails user) {
+    private String getToken(Map<String, Object> extraClaims, User user) {
 
+        extraClaims.put("First Name", user.getFirstName());
+        extraClaims.put("Last Name", user.getLastName());
 
         return Jwts.builder()
                 .setClaims(extraClaims)
+                .setIssuer(user.getEmail())
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))

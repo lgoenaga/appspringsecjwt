@@ -1,6 +1,7 @@
 package com.iudigital.appspringsecjwt.dto.request;
 
 import com.iudigital.appspringsecjwt.model.Role;
+import com.iudigital.appspringsecjwt.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -70,4 +71,5 @@ public class UserRequest implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

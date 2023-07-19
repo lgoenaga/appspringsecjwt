@@ -28,17 +28,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String token = getTokenFromRequest(request);
         final String username;
 
-        System.out.println("token in JwtAuthenticationFilter: " + token);
-
-
         if (token==null){
             filterChain.doFilter(request,response);
             return;
         }
 
         username = jwtService.getUsernameFromToken(token);
-        System.out.println("username in JwtAuthenticationFilter: " + username);
-
         if (username!=null && SecurityContextHolder.getContext().getAuthentication() ==null){
             final var userDetails = userDetailsService.loadUserByUsername(username);
 
