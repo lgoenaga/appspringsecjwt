@@ -7,7 +7,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +14,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -33,8 +33,9 @@ public class JwtService {
 
     private String getToken(Map<String, Object> extraClaims, User user) {
 
-        extraClaims.put("First Name", user.getFirstName());
-        extraClaims.put("Last Name", user.getLastName());
+        extraClaims.put("firstName", user.getFirstName());
+        extraClaims.put("lastName", user.getLastName());
+        extraClaims.put("roles", user.getRoles());
 
         return Jwts.builder()
                 .setClaims(extraClaims)
@@ -54,6 +55,7 @@ public class JwtService {
     }
 
     public String getUsernameFromToken(String token) {
+
         return getClaimFromToken(token, Claims::getSubject);
     }
 
@@ -61,7 +63,6 @@ public class JwtService {
 
         final String username = getUsernameFromToken(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-
 
     }
 

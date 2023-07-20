@@ -7,4 +7,5 @@ import org.springframework.stereotype.Component;
 public interface IUserService {
 
     User findByUsername(String username);
+
 }

@@ -12,10 +12,10 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Builder
-@Table(name = "roles")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Table(name = "roles")
 public class Role implements Serializable {
 
     @Serial
@@ -27,8 +27,5 @@ public class Role implements Serializable {
 
     @Column(unique = true, nullable = false, length = 20)
     private String rol;
-
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
 
 }

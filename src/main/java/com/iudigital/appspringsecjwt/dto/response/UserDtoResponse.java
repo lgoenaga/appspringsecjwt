@@ -1,19 +1,16 @@
 package com.iudigital.appspringsecjwt.dto.response;
 
+
 import com.iudigital.appspringsecjwt.model.Role;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class UserResponse{
+public class UserDtoResponse {
 
     private Long id;
     private String firstName;

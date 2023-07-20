@@ -18,9 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Data
 @Entity
@@ -76,8 +74,14 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
-    }
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        this.roles.forEach(role -> {
+            authorities.add((GrantedAuthority) () -> role.getRol());
+        });
+
+        return authorities;
+        }
+
 
     @Override
     public boolean isAccountNonExpired() {
