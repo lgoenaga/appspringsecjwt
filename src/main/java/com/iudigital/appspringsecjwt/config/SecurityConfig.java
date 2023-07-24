@@ -33,6 +33,8 @@ public class SecurityConfig{
                         authorize
                             .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/users/**").hasRole("ADMIN")
+                                .requestMatchers("/roles/**").hasRole("ADMIN")
+                                .requestMatchers("/crimes/**").hasRole("ADMIN")
                             .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

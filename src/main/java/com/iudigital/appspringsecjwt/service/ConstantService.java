@@ -11,6 +11,7 @@ public class ConstantService {
 
         public static final String MODEL_USER = "User";
         public static final String MODEL_ROLE = "Role";
+        public static final String MODEL_CRIME = "Crime";
 
 
         private ConstantService(){

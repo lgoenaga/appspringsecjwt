@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CrimeRepository extends JpaRepository<Crime, Long>{
 
+    boolean existsByName(String name);
 }

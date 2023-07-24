@@ -12,5 +12,14 @@ public interface ICrimeService {
         List<CrimeDtoResponse> getAll();
 
         @Transactional
-        CrimeDtoResponse addCrime(CrimeDtoRequest crimeDtoRequest);
+        CrimeDtoResponse saveCrime(CrimeDtoRequest crimeDtoRequest);
+
+        @Transactional(readOnly = true)
+        CrimeDtoResponse getCrimeById(Long id);
+
+        @Transactional
+        void deleteCrime(Long id);
+
+        @Transactional
+        CrimeDtoResponse updateCrime(Long id, CrimeDtoRequest crimeDtoRequest);
 }

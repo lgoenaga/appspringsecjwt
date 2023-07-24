@@ -6,13 +6,13 @@ import com.iudigital.appspringsecjwt.model.Crime;
 import com.iudigital.appspringsecjwt.model.User;
 import com.iudigital.appspringsecjwt.repository.CrimeRepository;
 import com.iudigital.appspringsecjwt.repository.UserRepository;
-import com.iudigital.appspringsecjwt.service.ConstantService;
 import com.iudigital.appspringsecjwt.service.interfaces.ICrimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -33,32 +33,93 @@ public class CrimeServiceImpl implements ICrimeService {
                     .id(crime.getId())
                     .name(crime.getName())
                     .description(crime.getDescription())
+                    .createdAt(crime.getCreatedAt())
+                    .updatedAt(crime.getUpdatedAt())
                     .userId(crime.getUser().getId())
                     .build()
         ).toList();
     }
 
     @Override
-    public CrimeDtoResponse addCrime(CrimeDtoRequest crimeDtoRequest){
+    public CrimeDtoResponse getCrimeById(Long id) {
 
-        User user = userRepository.findById(crimeDtoRequest.getUserId()).orElseThrow(() -> new RuntimeException(ConstantService.NOT_FOUND));
+        Crime crime = crimeRepository.findById(id).orElseThrow(NullPointerException::new);
 
-            Crime crime = new Crime();
+        return CrimeDtoResponse.builder()
+                .id(crime.getId())
+                .name(crime.getName())
+                .description(crime.getDescription())
+                .createdAt(crime.getCreatedAt())
+                .updatedAt(crime.getUpdatedAt())
+                .userId(crime.getUser().getId())
+                .build();
+    }
+    @Override
+    public CrimeDtoResponse saveCrime(CrimeDtoRequest crimeDtoRequest) {
 
-            crime.setName(crimeDtoRequest.getName());
-            crime.setDescription(crimeDtoRequest.getDescription());
-            crime.setCreatedAt(LocalDate.now());
-            crime.setUpdatedAt(LocalDate.now());
-            crime.setUser(user);
+        boolean isCrime = crimeRepository.existsByName(crimeDtoRequest.getName());
 
-            crimeRepository.save(crime);
+        if(isCrime){
+            throw new IllegalArgumentException();
+        }
 
-            return CrimeDtoResponse.builder()
-                    .id(crime.getId())
-                    .name(crime.getName())
-                    .description(crime.getDescription())
-                    .userId(crime.getUser().getId())
-                    .build();
+        User user = userRepository.findById(crimeDtoRequest.getUserId()).orElseThrow(NullPointerException::new);
+
+        Crime crime = new Crime();
+
+        crime.setName(crimeDtoRequest.getName().toUpperCase());
+        crime.setDescription(crimeDtoRequest.getDescription());
+        crime.setCreatedAt(LocalDate.now());
+        crime.setUpdatedAt(LocalDate.now());
+        crime.setUser(user);
+
+        crimeRepository.save(crime);
+
+        return CrimeDtoResponse.builder()
+                .id(crime.getId())
+                .name(crime.getName())
+                .description(crime.getDescription())
+                .createdAt(crime.getCreatedAt())
+                .updatedAt(crime.getUpdatedAt())
+                .userId(crime.getUser().getId())
+                .build();
+    }
+
+    @Override
+    public CrimeDtoResponse updateCrime(Long id, CrimeDtoRequest crimeDtoRequest) {
+
+        Crime crime = crimeRepository.findById(id).orElseThrow(NullPointerException::new);
+        User user = userRepository.findById(crimeDtoRequest.getUserId()).orElseThrow(IllegalArgumentException::new);
+
+        if (!Objects.equals(crimeDtoRequest.getName(), crime.getName())) {
+            boolean isCrime = crimeRepository.existsByName(crimeDtoRequest.getName());
+
+            if(isCrime){
+                throw new IllegalArgumentException();
+            }
+        }
+
+        crime.setName(crimeDtoRequest.getName().toUpperCase());
+        crime.setDescription(crimeDtoRequest.getDescription());
+        crime.setUser(user);
+        crime.setUpdatedAt(LocalDate.now());
+
+        crimeRepository.save(crime);
+
+        return CrimeDtoResponse.builder()
+                .id(crime.getId())
+                .name(crime.getName())
+                .description(crime.getDescription())
+                .createdAt(crime.getCreatedAt())
+                .updatedAt(crime.getUpdatedAt())
+                .userId(crime.getUser().getId())
+                .build();
+    }
+
+    @Override
+    public void deleteCrime(Long id) {
+
+        crimeRepository.deleteById(id);
     }
 
 }
