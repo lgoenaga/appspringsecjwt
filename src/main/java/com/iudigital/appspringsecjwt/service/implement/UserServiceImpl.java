@@ -166,11 +166,10 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             userExist.setRoles(userDtoRequest.getRoles());
         }
 
-        if (userDtoRequest.getPassword() != null && !userDtoRequest.getPassword().isEmpty()) {
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            String hashedPassword = passwordEncoder.encode(userDtoRequest.getPassword());
-            userExist.setPassword(hashedPassword);
-        }
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String hashedPassword = passwordEncoder.encode(userDtoRequest.getPassword());
+        userExist.setPassword(hashedPassword);
+
 
         if(userDtoRequest.getEnabled() != null){
             userExist.setEnabled(userDtoRequest.getEnabled());
@@ -190,8 +189,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         if (userDtoRequest.getDateBirth() != null) {
             userExist.setDateBirth(userDtoRequest.getDateBirth());
         }
-
-
 
         userExist.setUpdatedAt(LocalDate.now());
 

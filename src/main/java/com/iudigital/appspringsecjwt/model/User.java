@@ -74,9 +74,7 @@ public class User implements Serializable, UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        this.roles.forEach(role -> {
-            authorities.add((GrantedAuthority) () -> role.getRol());
-        });
+        this.roles.forEach(role -> authorities.add((GrantedAuthority) role::getRol));
 
         return authorities;
         }
