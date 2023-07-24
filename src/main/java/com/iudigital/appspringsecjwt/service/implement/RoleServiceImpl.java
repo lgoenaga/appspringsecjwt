@@ -87,13 +87,13 @@ public class RoleServiceImpl implements IRoleService {
     @Override
     public void deleteRole(Long id) {
 
-            Role role = roleRepository.findById(id).orElse(null);
+          boolean existsRole = roleRepository.existsById(id);
 
-            if(role == null){
+            if(!existsRole){
                 throw new NullPointerException();
             }
 
-            roleRepository.delete(role);
+            roleRepository.deleteById(id);
     }
 }
 

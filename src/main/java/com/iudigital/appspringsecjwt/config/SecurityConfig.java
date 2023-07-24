@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         jsr250Enabled = true)
 public class SecurityConfig{
 
+    private static final String ROLE_ADMIN = "ADMIN";
+
     private final AuthenticationProvider authProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -32,9 +34,9 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorize ->
                         authorize
                             .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/users/**").hasRole("ADMIN")
-                                .requestMatchers("/roles/**").hasRole("ADMIN")
-                                .requestMatchers("/crimes/**").hasRole("ADMIN")
+                                .requestMatchers("/users/**").hasRole(ROLE_ADMIN)
+                                .requestMatchers("/roles/**").hasRole(ROLE_ADMIN)
+                                .requestMatchers("/crimes/**").hasRole(ROLE_ADMIN)
                             .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

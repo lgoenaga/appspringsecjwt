@@ -119,6 +119,12 @@ public class CrimeServiceImpl implements ICrimeService {
     @Override
     public void deleteCrime(Long id) {
 
+        boolean isCrime = crimeRepository.existsById(id);
+
+        if(!isCrime){
+            throw new NullPointerException();
+        }
+
         crimeRepository.deleteById(id);
     }
 

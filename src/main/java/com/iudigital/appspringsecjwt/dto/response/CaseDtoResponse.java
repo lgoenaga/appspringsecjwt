@@ -19,7 +19,21 @@ public class CaseDtoResponse {
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private Long user_id;
-    private String user_name;
     private Long crime_id;
-    private String crime_name;
+
+    @Override
+    public String toString() {
+        return "\nCase {" + '\n' +
+                "\t\t\tid = " + id + '\n' +
+                "\t\t\tdescription = " + description + '\n' +
+                "\t\t\tdateCase = " + dateCase + '\n' +
+                "\t\t\tlatitude = " + latitude + '\n' +
+                "\t\t\tlongitude = " + longitude + '\n' +
+                "\t\t\taltitude = " + altitude + '\n' +
+                "\t\t\tcreatedAt = " + createdAt + '\n' +
+                "\t\t\tupdatedAt = " + updatedAt + '\n' +
+                "\t\t\tuser_id = " + user_id + '\n' +
+                "\t\t\tcrime_id = " + crime_id + '\n' +
+                "\t\t\t}";
+    }
 }

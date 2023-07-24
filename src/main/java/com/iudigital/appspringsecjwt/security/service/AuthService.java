@@ -30,11 +30,11 @@ public class AuthService {
 
 
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new NullPointerException();
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new IllegalArgumentException();
         }
 
         return AuthResponse.builder()

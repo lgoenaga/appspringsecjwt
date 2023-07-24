@@ -12,5 +12,12 @@ public interface ICaseService {
     List<CaseDtoResponse> getAll();
 
     @Transactional
-    CaseDtoResponse addCase(CaseDtoRequest caseDtoRequest);
+    CaseDtoResponse saveCase(CaseDtoRequest caseDtoRequest);
+
+    @Transactional(readOnly = true)
+    CaseDtoResponse getCaseById(Long id);
+
+    void deleteCase(Long id);
+
+    CaseDtoResponse updateCase(Long id, CaseDtoRequest caseDtoRequest);
 }
