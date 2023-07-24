@@ -27,7 +27,6 @@ public class CaseServiceImpl implements ICaseService {
 
 
     @Override
-    @Transactional(readOnly = true)
     public List<CaseDtoResponse> getAll() {
 
         List<Case> cases = caseRepository.findAll();
@@ -52,7 +51,6 @@ public class CaseServiceImpl implements ICaseService {
     }
 
     @Override
-    @Transactional
     public CaseDtoResponse addCase(CaseDtoRequest caseDtoRequest) throws IllegalArgumentException {
 
         boolean userExist = userRepository.existsById(caseDtoRequest.getUser_id());

@@ -3,13 +3,17 @@ package com.iudigital.appspringsecjwt.dto.request;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
 @Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class CaseDtoRequest {
 
     @Size(max = 60, message = "Name must be max 60 characters")

@@ -32,7 +32,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.getAll());
         } catch (NullPointerException e) {
             logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             logger.log(Level.SEVERE, String.format("%1s = %2s", ConstantService.ERROR, e.getMessage()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -98,7 +98,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") Long id) throws NullPointerException{
+    public ResponseEntity<String> destroy(@PathVariable("id") Long id) throws NullPointerException{
 
         try {
             userService.deleteUser(id);

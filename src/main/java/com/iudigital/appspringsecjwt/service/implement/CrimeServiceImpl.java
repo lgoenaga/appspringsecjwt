@@ -10,7 +10,6 @@ import com.iudigital.appspringsecjwt.service.ConstantService;
 import com.iudigital.appspringsecjwt.service.interfaces.ICrimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +24,6 @@ public class CrimeServiceImpl implements ICrimeService {
     UserRepository userRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<CrimeDtoResponse> getAll(){
         
         List<Crime> crimes = crimeRepository.findAll();
@@ -41,7 +39,6 @@ public class CrimeServiceImpl implements ICrimeService {
     }
 
     @Override
-    @Transactional
     public CrimeDtoResponse addCrime(CrimeDtoRequest crimeDtoRequest){
 
         User user = userRepository.findById(crimeDtoRequest.getUserId()).orElseThrow(() -> new RuntimeException(ConstantService.NOT_FOUND));

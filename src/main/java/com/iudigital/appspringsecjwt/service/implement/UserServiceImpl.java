@@ -62,7 +62,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UserDtoResponse> getAll() {
         List<User> users = userRepository.findAll();
 
@@ -87,7 +86,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     }
 
     @Override
-    @Transactional
     public UserDtoResponse saveUser(UserDtoRequest userDtoRequest){
 
         boolean userExist = userRepository.existsByUsername(userDtoRequest.getUsername());

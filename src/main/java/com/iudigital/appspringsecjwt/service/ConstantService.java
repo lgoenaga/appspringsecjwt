@@ -10,6 +10,8 @@ public class ConstantService {
         public static final String ERROR = "GENERAL ERROR";
 
         public static final String MODEL_USER = "User";
+        public static final String MODEL_ROLE = "Role";
+
 
         private ConstantService(){
 
