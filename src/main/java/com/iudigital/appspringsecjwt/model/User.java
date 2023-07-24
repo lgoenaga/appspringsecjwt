@@ -43,16 +43,15 @@ public class User implements Serializable, UserDetails {
     private String lastName;
     @Column(unique = true, nullable = false, length = 20)
     @NotNull(message = "Username is required")
-    @NotEmpty(message = "Username is required")
+    @NotEmpty(message = "Username not be empty")
     private String username;
     @Column(unique = true, nullable = false, length = 50)
     @NotNull(message = "Email is required")
-    @NotEmpty(message = "Email is required")
     @Email(message = "Email is not valid")
     private String email;
     @Column(nullable = false)
     @NotNull(message = "Password is required")
-    @NotEmpty(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
     @Column(nullable = false)
     @NotNull(message = "Enabled is required")

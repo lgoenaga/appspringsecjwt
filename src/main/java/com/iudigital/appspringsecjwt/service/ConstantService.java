@@ -7,6 +7,10 @@ public class ConstantService {
 
         public static final String INFO_FOUND = "Information exist";
 
+        public static final String ERROR = "GENERAL ERROR";
+
+        public static final String MODEL_USER = "User";
+
         private ConstantService(){
 
         }

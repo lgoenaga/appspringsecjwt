@@ -2,8 +2,9 @@ package com.iudigital.appspringsecjwt.controller;
 
 import com.iudigital.appspringsecjwt.dto.request.CaseDtoRequest;
 import com.iudigital.appspringsecjwt.dto.response.CaseDtoResponse;
-import com.iudigital.appspringsecjwt.service.interfaces.ICaseService;
+import com.iudigital.appspringsecjwt.service.implement.CaseServiceImpl;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,15 +13,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/cases")
+@RequiredArgsConstructor
 public class CaseController {
 
     final
-    ICaseService caseService;
-
-
-    public CaseController(ICaseService caseService) {
-        this.caseService = caseService;
-    }
+    CaseServiceImpl caseService;
 
 
     @GetMapping

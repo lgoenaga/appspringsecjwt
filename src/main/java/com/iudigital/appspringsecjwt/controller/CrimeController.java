@@ -2,8 +2,9 @@ package com.iudigital.appspringsecjwt.controller;
 
 import com.iudigital.appspringsecjwt.dto.request.CrimeDtoRequest;
 import com.iudigital.appspringsecjwt.dto.response.CrimeDtoResponse;
-import com.iudigital.appspringsecjwt.service.interfaces.ICrimeService;
+import com.iudigital.appspringsecjwt.service.implement.CrimeServiceImpl;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -13,13 +14,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/crimes")
+@RequiredArgsConstructor
 public class CrimeController {
 
     final
-    ICrimeService crimeService;
-    public CrimeController(ICrimeService crimeService) {
-        this.crimeService = crimeService;
-    }
+    CrimeServiceImpl crimeService;
 
     @GetMapping
     @Secured("ROLE_ADMIN")

@@ -9,9 +9,5 @@ public interface ICrimeService {
 
         List<CrimeDtoResponse> getAll();
 
-        CrimeDtoResponse getCrimeById(Long id);
-
         CrimeDtoResponse addCrime(CrimeDtoRequest crimeDtoRequest);
-
-        String deleteCrimeById(Long id);
 }

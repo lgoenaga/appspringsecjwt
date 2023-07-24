@@ -7,6 +7,7 @@ import com.iudigital.appspringsecjwt.repository.CaseRepository;
 import com.iudigital.appspringsecjwt.repository.CrimeRepository;
 import com.iudigital.appspringsecjwt.repository.UserRepository;
 import com.iudigital.appspringsecjwt.service.interfaces.ICaseService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,22 +15,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CaseServiceImpl implements ICaseService {
-
 
     final
     CaseRepository caseRepository;
     final
     UserRepository userRepository;
-
     final
     CrimeRepository crimeRepository;
-
-    public CaseServiceImpl(CaseRepository caseRepository, UserRepository userRepository, CrimeRepository crimeRepository) {
-        this.caseRepository = caseRepository;
-        this.userRepository = userRepository;
-        this.crimeRepository = crimeRepository;
-    }
 
 
     @Override

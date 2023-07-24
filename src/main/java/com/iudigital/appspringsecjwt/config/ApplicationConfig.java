@@ -1,6 +1,5 @@
 package com.iudigital.appspringsecjwt.config;
 
-
 import com.iudigital.appspringsecjwt.service.implement.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

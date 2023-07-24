@@ -9,7 +9,6 @@ import com.iudigital.appspringsecjwt.service.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-
 @Service
 @RequiredArgsConstructor
-
 public class UserServiceImpl implements IUserService, UserDetailsService {
 
     final
@@ -30,15 +27,41 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     RoleRepository roleRepository;
 
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String username){
+       User user = userRepository.findByUsername(username);
+
+        if(user == null){
+            throw new NullPointerException();
+        }
+
+        return user;
+    }
+    @Override
+    public UserDtoResponse getUserById(Long id) {
+
+        User user = userRepository.findById(id).orElse(null);
+
+        if(user == null){
+            throw new NullPointerException();
+        }
+
+        return UserDtoResponse.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .enabled(user.getEnabled())
+                .roles(user.getRoles())
+                .image(user.getImage())
+                .dateBirth(user.getDateBirth())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username);
-    }
-
     @Transactional(readOnly = true)
     public List<UserDtoResponse> getAll() {
         List<User> users = userRepository.findAll();
@@ -63,10 +86,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     }
 
+    @Override
     @Transactional
-    public UserDtoResponse addUser(UserDtoRequest userDtoRequest){
+    public UserDtoResponse saveUser(UserDtoRequest userDtoRequest){
 
-        boolean userExist =  userRepository.existsByUsername(userDtoRequest.getUsername());
+        boolean userExist = userRepository.existsByUsername(userDtoRequest.getUsername());
         boolean emailExist = userRepository.existsByEmail(userDtoRequest.getEmail());
 
         if(userExist || emailExist){
@@ -109,8 +133,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     }
 
-
-    @Transactional
+    @Override
     public UserDtoResponse updateUser(Long id, UserDtoRequest userDtoRequest) {
 
         User userExist = userRepository.findById(id).orElse(null);
@@ -119,9 +142,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             throw new NullPointerException();
         }
 
-        if(userExist.getRoles().isEmpty()){
-            userExist.setRoles(roleRepository.findByRol("ROLE_USER"));
-        }
 
         if(!userExist.getUsername().equals(userDtoRequest.getUsername())){
             boolean existUserName = userRepository.existsByUsername(userDtoRequest.getUsername());
@@ -141,9 +161,16 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             }
             userExist.setEmail(userDtoRequest.getEmail());
         }
+
+        if (userDtoRequest.getRoles() != null && !userDtoRequest.getRoles().isEmpty()) {
+            userExist.setRoles(userDtoRequest.getRoles());
+        }
+
+        if (userDtoRequest.getPassword() != null && !userDtoRequest.getPassword().isEmpty()) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(userDtoRequest.getPassword());
             userExist.setPassword(hashedPassword);
+        }
 
         if(userDtoRequest.getEnabled() != null){
             userExist.setEnabled(userDtoRequest.getEnabled());
@@ -164,11 +191,11 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
             userExist.setDateBirth(userDtoRequest.getDateBirth());
         }
 
-        if (userDtoRequest.getRoles() != null) {
-            userExist.setRoles(userDtoRequest.getRoles());
-        }
+
 
         userExist.setUpdatedAt(LocalDate.now());
+
+        userExist = userRepository.save(userExist);
 
         return UserDtoResponse.builder()
                 .id(userExist.getId())
@@ -179,16 +206,21 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
                 .enabled(userExist.getEnabled())
                 .dateBirth(userExist.getDateBirth())
                 .image(userExist.getImage())
-                .roles(userExist.getRoles())
+                .roles(userExist.getRoles().stream().toList())
                 .createdAt(userExist.getCreatedAt())
                 .updatedAt(userExist.getUpdatedAt())
                 .build();
     }
     public void deleteUser(Long id) {
 
+        boolean userExist = userRepository.existsById(id);
+
+        if (!userExist){
+            throw new NullPointerException();
+        }
+
         userRepository.deleteById(id);
 
     }
-
 
 }

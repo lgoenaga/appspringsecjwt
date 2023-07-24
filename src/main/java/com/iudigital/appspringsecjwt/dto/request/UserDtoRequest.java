@@ -24,7 +24,7 @@ public class UserDtoRequest {
     private String lastName;
 
     @NotNull(message = "Username is required DTO")
-    @NotEmpty(message = "Username is required DTO")
+    @NotEmpty(message = "Username not be empty DTO")
     private String username;
 
 
