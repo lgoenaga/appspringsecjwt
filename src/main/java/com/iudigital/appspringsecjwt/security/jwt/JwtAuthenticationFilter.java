@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token==null){
             filterChain.doFilter(request,response);
-            return;
+          return;
         }
 
         username = jwtService.getUsernameFromToken(token);
@@ -51,15 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
+    private String getTokenFromRequest(HttpServletRequest request) throws NullPointerException, HttpClientErrorException.Forbidden {
 
-        final String authHeader = request.getHeader("Authorization");
+            final String authHeader = request.getHeader("Authorization");
 
-        if(StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")){
+            if(StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")){
 
-            return authHeader.substring(7);
-        }else {
-            return null;
-        }
+                return authHeader.substring(7);
+            }else {
+                return null;
+            }
     }
 }

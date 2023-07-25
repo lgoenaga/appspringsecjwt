@@ -1,6 +1,9 @@
 package com.iudigital.appspringsecjwt.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +28,8 @@ public class Role implements Serializable {
     private Long id;
 
     @Column(unique = true, nullable = false, length = 20)
+    @NotNull(message = "Username is required")
+    @NotEmpty(message = "Username not be empty")
     private String rol;
 
 }

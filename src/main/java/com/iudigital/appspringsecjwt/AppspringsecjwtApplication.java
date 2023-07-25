@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AppspringsecjwtApplication {
 
     public static void main(String[] args) {
+
+
         SpringApplication.run(AppspringsecjwtApplication.class, args);
     }
 

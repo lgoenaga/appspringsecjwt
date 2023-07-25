@@ -28,13 +28,10 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request)throws NullPointerException, IllegalArgumentException {
 
         try {
-            logger.info(ConstantService.MODEL_AUTH + " " + ConstantService.SUCCESSFULLY);
             return ResponseEntity.ok(authService.login(request));
         } catch (NullPointerException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
-            logger.warning(ConstantService.BAD_REQUEST + " = " + e.getCause());
             return ResponseEntity.badRequest().build();
         }catch (Exception e) {
             logger.log(Level.SEVERE, String.format("%1$s = %2$s", ConstantService.ERROR, e.getMessage()));
@@ -43,15 +40,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request)throws IllegalArgumentException {
+    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
 
-        try {
-            logger.info(ConstantService.MODEL_AUTH + " " + ConstantService.SUCCESSFULLY);
-            return ResponseEntity.ok(authService.register(request));
-        } catch (IllegalArgumentException e) {
-            logger.warning(ConstantService.BAD_REQUEST + " = " + e.getCause());
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(authService.register(request));
     }
 
 }

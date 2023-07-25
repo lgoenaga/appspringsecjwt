@@ -4,15 +4,15 @@ import com.iudigital.appspringsecjwt.dto.request.RoleDtoRequest;
 import com.iudigital.appspringsecjwt.dto.response.RoleDtoResponse;
 import com.iudigital.appspringsecjwt.service.ConstantService;
 import com.iudigital.appspringsecjwt.service.implement.RoleServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 @RestController
 @RequestMapping("/roles")
@@ -23,84 +23,88 @@ public class RolController{
     private final RoleServiceImpl roleService;
 
     @GetMapping
-    public ResponseEntity<List<RoleDtoResponse>> index() throws NullPointerException{
+    public ResponseEntity<List<RoleDtoResponse>> index() {
 
         try {
             logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.INFO_FOUND);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(roleService.getAll());
-        } catch (NullPointerException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<RoleDtoResponse> show(@PathVariable("id") Long id) throws NullPointerException{
+    public ResponseEntity<RoleDtoResponse> show(@PathVariable("id") Long id) {
+
+        boolean existsRol = roleService.existsRole(id);
+
+        if (!existsRol) {
+            logger.warning(ConstantService.NOT_FOUND + " = " + ConstantService.MODEL_ROLE);
+               return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
         try {
+            RoleDtoResponse roleDtoResponse = roleService.getRolById(id);
             logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.INFO_FOUND);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(roleService.getRolById(id));
-        } catch (NullPointerException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(roleDtoResponse);
         } catch (Exception e) {
             logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping
-    public ResponseEntity<String> store(@RequestBody RoleDtoRequest roleDtoRequest) throws IllegalArgumentException {
+    public ResponseEntity<RoleDtoResponse> store(@RequestBody RoleDtoRequest roleDtoRequest)  {
 
         try {
+            RoleDtoResponse roleDtoResponse = roleService.saveRole(roleDtoRequest);
             logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY + " " + "\n" +
-                            roleService.saveRole(roleDtoRequest).toString()
-            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(roleDtoResponse);
+
         } catch (IllegalArgumentException e) {
             logger.warning(ConstantService.BAD_REQUEST + " = " + e.getCause());
-            return ResponseEntity.badRequest().body(ConstantService.MODEL_ROLE + " " + ConstantService.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+
         } catch (Exception e) {
             logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<String> update(@PathVariable("id") Long id, @RequestBody RoleDtoRequest roleDtoRequest) throws IllegalArgumentException {
+    public ResponseEntity<RoleDtoResponse> update(@PathVariable("id") Long id,@Valid @RequestBody RoleDtoRequest roleDtoRequest)  {
+
 
         try {
-            logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY + " " + "\n" +
-                            roleService.updateRole(id, roleDtoRequest).toString()
-            );
-        } catch (IllegalArgumentException e) {
-            logger.warning(ConstantService.BAD_REQUEST + " = " + e.getCause());
-            return ResponseEntity.badRequest().body(ConstantService.MODEL_ROLE + " " + ConstantService.BAD_REQUEST);
+            RoleDtoResponse roleDtoResponse = roleService.updateRole(id, roleDtoRequest);
+
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(roleDtoResponse);
         } catch (Exception e) {
-            logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
+
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> destroy(@PathVariable("id") Long id) throws NullPointerException{
+    public ResponseEntity<String> destroy(@PathVariable("id") Long id) {
+
+        boolean existsRol = roleService.existsRole(id);
+
+        if (!existsRol) {
+            logger.warning(ConstantService.NOT_FOUND + " = " + ConstantService.MODEL_ROLE);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ConstantService.NOT_FOUND + " = " + ConstantService.MODEL_ROLE);
+        }
 
         try {
             roleService.deleteRole(id);
             logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
-        } catch (NullPointerException | EntityNotFoundException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ConstantService.MODEL_ROLE + " " + ConstantService.NOT_FOUND);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, String.format("%1$s = %2$s", ConstantService.ERROR, e.getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ConstantService.ERROR + " = " + e.getMessage());
+            logger.warning(ConstantService.ERROR + " = " + e.getCause());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ConstantService.ERROR + " = " + e.getCause());
         }
     }
+
 }
