@@ -1,11 +1,12 @@
 package com.iudigital.appspringsecjwt.exception;
 
 import com.iudigital.appspringsecjwt.dto.response.ErrorDtoResponse;
-import com.iudigital.appspringsecjwt.dto.response.RoleDtoResponse;
-import org.springframework.http.ResponseEntity;
+
+import java.io.Serial;
 
 public class RestExceptions extends Exception{
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private ErrorDtoResponse errorDtoResponse;
@@ -32,7 +33,4 @@ public class RestExceptions extends Exception{
         return errorDtoResponse;
     }
 
-    public ResponseEntity<RoleDtoResponse> responseEntity() {
-        return ResponseEntity.status(errorDtoResponse.getStatus()).body(null);
-    }
 }

@@ -1,11 +1,10 @@
 package com.iudigital.appspringsecjwt.dto.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.ResponseEntity;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 public class ErrorDtoResponse implements Serializable {
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String error;
@@ -24,15 +24,13 @@ public class ErrorDtoResponse implements Serializable {
 
     private LocalDateTime date;
 
-
-    public ResponseEntity<ErrorDtoResponse> toResponseEntity() {
-        return ResponseEntity.status(status).body(
-                ErrorDtoResponse.builder()
-                        .error(error)
-                        .message(message)
-                        .status(status)
-                        .date(date)
-                        .build()
-        );
+    @Override
+    public String toString() {
+        return "{\n" +
+                "\t error = " + error + '\n' +
+                "\t message = " + message + '\n' +
+                "\t status = " + status + '\n' +
+                "\t date = " + date +  '\n' +
+                "}";
     }
 }
