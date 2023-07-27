@@ -2,6 +2,7 @@ package com.iudigital.appspringsecjwt.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.Cascade;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -38,12 +39,14 @@ public class Case implements Serializable{
     private LocalDate updatedAt;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JoinColumn(name = "crime_id", nullable = false)
     private Crime crime;
 

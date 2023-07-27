@@ -2,15 +2,17 @@ package com.iudigital.appspringsecjwt.controller;
 
 import com.iudigital.appspringsecjwt.dto.request.CrimeDtoRequest;
 import com.iudigital.appspringsecjwt.dto.response.CrimeDtoResponse;
+import com.iudigital.appspringsecjwt.dto.response.ErrorDtoResponse;
+import com.iudigital.appspringsecjwt.exception.IllegalArgumentExceptions;
 import com.iudigital.appspringsecjwt.service.ConstantService;
 import com.iudigital.appspringsecjwt.service.implement.CrimeServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -92,17 +94,24 @@ public class CrimeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> destroy(@PathVariable("id") Long id) throws NullPointerException{
+    public ResponseEntity<Object> destroy(@PathVariable("id") Long id) throws NullPointerException{
         try {
             crimeService.deleteCrime(id);
-            logger.info(ConstantService.MODEL_CRIME + " " + ConstantService.SUCCESSFULLY);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(ConstantService.MODEL_CRIME + " " + ConstantService.SUCCESSFULLY);
-        } catch (NullPointerException | EntityNotFoundException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ConstantService.MODEL_CRIME + " " + ConstantService.NOT_FOUND);
-        } catch (Exception e) {
+        } catch (IllegalArgumentExceptions e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    e.getErrorDtoResponse()
+            );
+        }catch (Exception e) {
             logger.log(Level.SEVERE, String.format("%1$s = %2$s", ConstantService.ERROR, e.getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ConstantService.ERROR + " = " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    ErrorDtoResponse.builder()
+                            .error(ConstantService.VIOLATION_CONSTRAINT)
+                            .message(e.getMessage())
+                            .status(HttpStatus.CONFLICT.value())
+                            .date(LocalDateTime.now())
+                            .build()
+            );
         }
     }
 

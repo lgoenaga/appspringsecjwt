@@ -32,21 +32,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(e.getErrorDtoResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({NullPointerExceptions.class})
     public ResponseEntity<ErrorDtoResponse> getNullPointer(NullPointerExceptions e) {
         log.warning("Null pointer: " + e.getMessage());
-        return new ResponseEntity<>(e.getErrorDtoResponse(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getErrorDtoResponse(), HttpStatus.NOT_FOUND);
 
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler({IllegalArgumentExceptions.class})
     public ResponseEntity<ErrorDtoResponse> getIllegalArgument(IllegalArgumentExceptions e) {
         log.warning("Illegal argument: " + e.getMessage());
-        return new ResponseEntity<>(e.getErrorDtoResponse(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getErrorDtoResponse(), HttpStatus.CONFLICT);
 
     }
-
 
 }

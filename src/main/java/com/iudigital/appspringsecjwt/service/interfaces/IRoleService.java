@@ -13,13 +13,13 @@ import java.util.List;
 public interface IRoleService {
 
 
-    List<RoleDtoResponse> getAll() throws NullPointerExceptions;
+    List<RoleDtoResponse> getAll() throws NullPointerExceptions, BadRequestExceptions;
 
 
     RoleDtoResponse getRolById(Long id) throws NullPointerExceptions, IllegalArgumentExceptions;
 
 
-    RoleDtoResponse saveRole(RoleDtoRequest roleDtoRequest) throws BadRequestExceptions;
+    RoleDtoResponse saveRole(RoleDtoRequest roleDtoRequest) throws BadRequestExceptions, IllegalArgumentExceptions;
 
 
     RoleDtoResponse updateRole(Long id, RoleDtoRequest roleDtoRequest) throws NullPointerExceptions, IllegalArgumentExceptions, BadRequestExceptions;

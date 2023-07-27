@@ -15,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.iudigital.appspringsecjwt.util.VerifyNotExist;
+import com.iudigital.appspringsecjwt.util.VerifyExist;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,6 +28,9 @@ import static java.text.MessageFormat.format;
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements IRoleService {
+
+    VerifyNotExist verifyNotExist = new VerifyNotExist();
+    VerifyExist verifyExist = new VerifyExist();
 
     private static final String UPDATE_ROLE = "Role Update";
     private static final String DELETE_ROLE = "Role Delete";
@@ -38,27 +44,23 @@ public class RoleServiceImpl implements IRoleService {
 
     final RoleRepository roleRepository;
 
-    public void verifyRoleId(Long id) throws IllegalArgumentExceptions {
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoleDtoResponse> getAll() throws BadRequestExceptions {
 
-        boolean existsRole = roleRepository.existsById(id);
+        List<Role> roles = roleRepository.findAll();
 
-        if(!existsRole){
-            logger.warning(ConstantService.ILLEGAL_ARGUMENT + " = " + ConstantService.NOT_ID + " method " + VERIFY_ROLE);
-            throw new IllegalArgumentExceptions(
+        if (roles.isEmpty()) {
+            logger.warning(ConstantService.BAD_REQUEST + " = " + ConstantService.METHOD + GET_ROL);
+            throw new BadRequestExceptions(
                     ErrorDtoResponse.builder()
-                            .message(ConstantService.NOT_ID + " method " + VERIFY_ROLE)
-                            .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-                            .status(HttpStatus.NOT_FOUND.value())
+                            .message(ConstantService.BAD_REQUEST + " = " + ConstantService.METHOD + GET_ROL)
+                            .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                            .status(HttpStatus.BAD_REQUEST.value())
                             .date(LocalDateTime.now())
                             .build()
             );
         }
-    }
-    @Override
-    @Transactional(readOnly = true)
-    public List<RoleDtoResponse> getAll() throws NullPointerExceptions {
-
-        List<Role> roles = roleRepository.findAll();
 
         logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
         return roles.stream().map(role ->
@@ -71,21 +73,20 @@ public class RoleServiceImpl implements IRoleService {
 
     @Override
     @Transactional(readOnly = true)
-    public RoleDtoResponse getRolById(Long id) throws NullPointerExceptions, IllegalArgumentExceptions {
-
-        verifyRoleId(id);
+    public RoleDtoResponse getRolById(Long id) throws IllegalArgumentExceptions, NullPointerExceptions {
 
         boolean existsRole = roleRepository.existsById(id);
+        verifyNotExist.verify(existsRole, ConstantService.NOT_ID + ConstantService.METHOD + GET_ROL);
 
         Role role = roleRepository.findById(id).orElseThrow(null);
 
         if(!existsRole || role == null){
-            logger.warning(ConstantService.BAD_REQUEST + " = " + GET_ROL);
+            logger.warning(ConstantService.NOT_FOUND + " = " + GET_ROL);
             throw new NullPointerExceptions(
                     ErrorDtoResponse.builder()
-                            .message(ConstantService.BAD_REQUEST + " = " + GET_ROL)
-                            .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                            .status(HttpStatus.BAD_REQUEST.value())
+                            .message(ConstantService.NOT_FOUND + " = " + GET_ROL)
+                            .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                            .status(HttpStatus.NOT_FOUND.value())
                             .date(LocalDateTime.now())
                             .build()
             );
@@ -99,23 +100,12 @@ public class RoleServiceImpl implements IRoleService {
 
     @Override
     @Transactional
-    public RoleDtoResponse saveRole(RoleDtoRequest roleDtoRequest) throws BadRequestExceptions {
+    public RoleDtoResponse saveRole(RoleDtoRequest roleDtoRequest) throws IllegalArgumentExceptions {
 
         String roleDtoRequestSave = ROLE+roleDtoRequest.getRol().toUpperCase();
 
         boolean existsRole = roleRepository.existsByRol(roleDtoRequestSave);
-
-        if(existsRole){
-            logger.warning(ConstantService.INFO_FOUND + " =  " + SAVE_ROLE);
-            throw new BadRequestExceptions(
-                    ErrorDtoResponse.builder()
-                            .message(ConstantService.INFO_FOUND + " =  " + SAVE_ROLE)
-                            .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                            .status(HttpStatus.BAD_REQUEST.value())
-                            .date(LocalDateTime.now())
-                            .build()
-            );
-        }
+        verifyExist.verify(existsRole, ConstantService.INFO_FOUND + ConstantService.METHOD + SAVE_ROLE);
 
         Role role = Role.builder()
                     .rol(roleDtoRequestSave)
@@ -128,31 +118,22 @@ public class RoleServiceImpl implements IRoleService {
                     .rol(role.getRol())
                     .build();
 
-
     }
 
     @Override
     @Transactional
-    public RoleDtoResponse updateRole(Long id, RoleDtoRequest roleDtoRequest) throws BadRequestExceptions, IllegalArgumentExceptions, NullPointerExceptions {
+    public RoleDtoResponse updateRole(Long id, RoleDtoRequest roleDtoRequest) throws IllegalArgumentExceptions, NullPointerExceptions {
 
         String roleDtoRequestUpdate = ROLE+roleDtoRequest.getRol().toUpperCase();
 
-        verifyRoleId(id);
+        boolean existsRole = roleRepository.existsById(id);
+        verifyNotExist.verify(existsRole, ConstantService.NOT_ID + ConstantService.METHOD + VERIFY_ROLE);
 
         RoleDtoResponse role = getRolById(id);
+        if(!role.getRol().equals(roleDtoRequestUpdate)){
 
-        boolean existsRole = roleRepository.existsByRol(roleDtoRequestUpdate);
-
-        if(existsRole  && !role.getRol().equals(roleDtoRequestUpdate)){
-            logger.warning(ConstantService.INFO_FOUND + " =  " + UPDATE_ROLE);
-            throw new BadRequestExceptions(
-                    ErrorDtoResponse.builder()
-                            .message(ConstantService.INFO_FOUND + " =  " + UPDATE_ROLE)
-                            .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                            .status(HttpStatus.BAD_REQUEST.value())
-                            .date(LocalDateTime.now())
-                            .build()
-            );
+            boolean existsRoleUpdate = roleRepository.existsByRol(roleDtoRequestUpdate);
+            verifyExist.verify(existsRoleUpdate, ConstantService.INFO_FOUND + ConstantService.METHOD + UPDATE_ROLE);
         }
 
         role.setRol(roleDtoRequestUpdate);
@@ -174,7 +155,9 @@ public class RoleServiceImpl implements IRoleService {
     @Transactional
     public void deleteRole(Long id) throws IllegalArgumentExceptions {
 
-        verifyRoleId(id);
+        boolean existsRole = roleRepository.existsById(id);
+
+        verifyNotExist.verify(existsRole, ConstantService.NOT_ID + ConstantService.METHOD + VERIFY_ROLE);
 
         try {
 

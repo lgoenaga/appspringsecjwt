@@ -30,6 +30,8 @@ public class ConstantService {
 
         public static final String VIOLATION_CONSTRAINT = "Foreign key constraint fails";
 
+        public static final String METHOD = " method ";
+
 
         private ConstantService(){
 

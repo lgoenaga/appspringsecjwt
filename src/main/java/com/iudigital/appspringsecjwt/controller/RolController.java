@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.text.MessageFormat.format;
 
 
 @RestController
@@ -28,14 +31,36 @@ public class RolController{
     private final RoleServiceImpl roleService;
 
     @GetMapping
-    public ResponseEntity<List<RoleDtoResponse>> index() {
+    public ResponseEntity<Object> index() {
 
         try {
-            logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.INFO_FOUND);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(roleService.getAll());
+            List<RoleDtoResponse> roles = roleService.getAll();
+
+            if (!roles.isEmpty()) {
+                logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.INFO_FOUND);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(roleService.getAll());
+            }else {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+                        ErrorDtoResponse.builder()
+                                .message(ConstantService.NOT_FOUND + " = " + ConstantService.METHOD + ConstantService.MODEL_ROLE)
+                                .error(HttpStatus.NO_CONTENT.getReasonPhrase())
+                                .status(HttpStatus.NO_CONTENT.value())
+                                .date(LocalDateTime.now())
+                                .build()
+                );
+            }
+        }catch (BadRequestExceptions e){
+
+            logger.warning(ConstantService.BAD_REQUEST + " = " + ConstantService.METHOD + ConstantService.MODEL_ROLE);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    e.getErrorDtoResponse()
+            );
+
         } catch (Exception e) {
             logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    e.getMessage()
+            );
         }
     }
 
@@ -48,8 +73,18 @@ public class RolController{
             logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(roleDtoResponse);
         } catch (IllegalArgumentExceptions | NullPointerExceptions e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     e.getErrorDtoResponse()
+            );
+        }catch (Exception e) {
+            logger.log(Level.SEVERE, format("{0} = {1}", ConstantService.ERROR, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ErrorDtoResponse.builder()
+                            .error(ConstantService.ERROR)
+                            .message(e.getMessage())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .date(LocalDateTime.now())
+                            .build()
             );
         }
 
@@ -60,11 +95,31 @@ public class RolController{
 
         try {
             RoleDtoResponse roleDtoResponse = roleService.saveRole(roleDtoRequest);
-            logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
-            return ResponseEntity.status(HttpStatus.CREATED).body(roleDtoResponse);
-        } catch (BadRequestExceptions e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            if (roleDtoResponse!=null){
+                logger.info(ConstantService.MODEL_ROLE + " " + ConstantService.SUCCESSFULLY);
+                return ResponseEntity.status(HttpStatus.CREATED).body(roleDtoResponse);
+            }else {
+                return ResponseEntity.badRequest().body(
+                            ErrorDtoResponse.builder()
+                                .error(ConstantService.BAD_REQUEST)
+                                .message(ConstantService.BAD_REQUEST)
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .date(LocalDateTime.now())
+                                .build() );
+            }
+        } catch (IllegalArgumentExceptions e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     e.getErrorDtoResponse()
+            );
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, format("{0} = {1}", ConstantService.ERROR, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ErrorDtoResponse.builder()
+                            .error(ConstantService.ERROR)
+                            .message(e.getMessage())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .date(LocalDateTime.now())
+                            .build()
             );
         }
 
@@ -80,9 +135,15 @@ public class RolController{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     e.getErrorDtoResponse()
             );
-        } catch (BadRequestExceptions e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    e.getErrorDtoResponse()
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, String.format("%1$s = %2$s", ConstantService.ERROR, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    ErrorDtoResponse.builder()
+                            .error(ConstantService.ERROR)
+                            .message(e.getMessage())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .date(LocalDateTime.now())
+                            .build()
             );
         }
     }
@@ -98,6 +159,7 @@ public class RolController{
                  e.getErrorDtoResponse()
             );
         } catch (Exception e) {
+            logger.log(Level.SEVERE, String.format("%1$s = %2$s", ConstantService.ERROR, e.getMessage()));
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
                     ErrorDtoResponse.builder()
                             .error(ConstantService.VIOLATION_CONSTRAINT)
