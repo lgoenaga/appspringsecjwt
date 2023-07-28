@@ -2,30 +2,34 @@ package com.iudigital.appspringsecjwt.service.implement;
 
 import com.iudigital.appspringsecjwt.dto.request.CrimeDtoRequest;
 import com.iudigital.appspringsecjwt.dto.response.CrimeDtoResponse;
+import com.iudigital.appspringsecjwt.dto.response.ErrorDtoResponse;
+import com.iudigital.appspringsecjwt.exception.BadRequestExceptions;
 import com.iudigital.appspringsecjwt.exception.IllegalArgumentExceptions;
+import com.iudigital.appspringsecjwt.exception.NullPointerExceptions;
 import com.iudigital.appspringsecjwt.model.Crime;
 import com.iudigital.appspringsecjwt.model.User;
 import com.iudigital.appspringsecjwt.repository.CrimeRepository;
 import com.iudigital.appspringsecjwt.repository.UserRepository;
 import com.iudigital.appspringsecjwt.service.ConstantService;
 import com.iudigital.appspringsecjwt.service.interfaces.ICrimeService;
+import com.iudigital.appspringsecjwt.util.VerifyExist;
 import com.iudigital.appspringsecjwt.util.VerifyNotExist;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static java.text.MessageFormat.format;
 
 @Service
 @RequiredArgsConstructor
 public class CrimeServiceImpl implements ICrimeService {
 
+    private static final String VERIFY_USER = "Verify User";
     VerifyNotExist verifyNotExist = new VerifyNotExist();
+    VerifyExist verifyExist = new VerifyExist();
     private static final Logger logger  = Logger.getLogger(CrimeServiceImpl.class.getName());
     private static final String VERIFY_CRIME = "Verify Crime";
 
@@ -42,101 +46,162 @@ public class CrimeServiceImpl implements ICrimeService {
     final
     UserRepository userRepository;
 
-    @Override
-    public List<CrimeDtoResponse> getAll(){
-        
-        List<Crime> crimes = crimeRepository.findAll();
+    private User verifyNotUser(CrimeDtoRequest crimeDtoRequest) throws IllegalArgumentExceptions, NullPointerExceptions {
+        boolean isUser = userRepository.existsById(crimeDtoRequest.getUserId());
+        verifyNotExist.verify(isUser, ConstantService.NOT_ID + ConstantService.METHOD + VERIFY_USER);
 
-        return crimes.stream().map(crime ->
-            CrimeDtoResponse.builder()
+        return userRepository.findById(crimeDtoRequest.getUserId()).orElseThrow(
+                () -> new NullPointerExceptions(
+                        ErrorDtoResponse.builder()
+                                .message(ConstantService.NOT_FOUND)
+                                .error(ConstantService.NOT_FOUND)
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .date(LocalDateTime.now())
+                                .build()
+                )
+        );
+
+    }
+    @Override
+    public List<CrimeDtoResponse> getAll() throws BadRequestExceptions {
+
+        try {
+            List<Crime> crimes = crimeRepository.findAll();
+            return crimes.stream().map(crime ->
+                    CrimeDtoResponse.builder()
+                            .id(crime.getId())
+                            .name(crime.getName())
+                            .description(crime.getDescription())
+                            .createdAt(crime.getCreatedAt())
+                            .updatedAt(crime.getUpdatedAt())
+                            .userId(crime.getUser().getId())
+                            .build()
+            ).toList();
+        } catch (Exception e) {
+            throw new BadRequestExceptions(
+                    ErrorDtoResponse.builder()
+                            .message(ConstantService.BAD_REQUEST)
+                            .error(ConstantService.BAD_REQUEST)
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .date(LocalDateTime.now())
+                            .build()
+            );
+        }
+
+
+    }
+
+    @Override
+    public CrimeDtoResponse getCrimeById(Long id) throws NullPointerExceptions {
+
+        Crime crime = crimeRepository.findById(id).orElseThrow(
+                () -> new NullPointerExceptions(
+                        ErrorDtoResponse.builder()
+                                .message(ConstantService.NOT_FOUND)
+                                .error(ConstantService.NOT_FOUND)
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .date(LocalDateTime.now())
+                                .build()
+                )
+        );
+
+        return CrimeDtoResponse.builder()
+                .id(crime.getId())
+                .name(crime.getName())
+                .description(crime.getDescription())
+                .createdAt(crime.getCreatedAt())
+                .updatedAt(crime.getUpdatedAt())
+                .userId(crime.getUser().getId())
+                .build();
+    }
+    @Override
+    public CrimeDtoResponse saveCrime(CrimeDtoRequest crimeDtoRequest) throws IllegalArgumentExceptions, NullPointerExceptions, BadRequestExceptions {
+
+        boolean isCrime = crimeRepository.existsByName(crimeDtoRequest.getName());
+        verifyExist.verify(isCrime, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CRIME);
+
+        User user = verifyNotUser(crimeDtoRequest);
+
+        Crime crime = Crime.builder()
+                .name(crimeDtoRequest.getName().toUpperCase())
+                .description(crimeDtoRequest.getDescription())
+                .createdAt(LocalDate.now())
+                .updatedAt(LocalDate.now())
+                .user(user)
+                .build();
+
+        try {
+            crimeRepository.save(crime);
+
+            return CrimeDtoResponse.builder()
                     .id(crime.getId())
                     .name(crime.getName())
                     .description(crime.getDescription())
                     .createdAt(crime.getCreatedAt())
                     .updatedAt(crime.getUpdatedAt())
                     .userId(crime.getUser().getId())
-                    .build()
-        ).toList();
+                    .build();
+        } catch (Exception e) {
+            throw new BadRequestExceptions(
+                    ErrorDtoResponse.builder()
+                            .message(ConstantService.BAD_REQUEST)
+                            .error(ConstantService.BAD_REQUEST)
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .date(LocalDateTime.now())
+                            .build()
+            );
+        }
     }
 
     @Override
-    public CrimeDtoResponse getCrimeById(Long id) {
+    public CrimeDtoResponse updateCrime(Long id, CrimeDtoRequest crimeDtoRequest) throws IllegalArgumentExceptions, NullPointerExceptions, BadRequestExceptions {
 
-        Crime crime = crimeRepository.findById(id).orElseThrow(NullPointerException::new);
+        boolean isCrime = crimeRepository.existsById(id);
+        verifyNotExist.verify(isCrime, ConstantService.NOT_ID + ConstantService.METHOD + VERIFY_CRIME);
 
-        return CrimeDtoResponse.builder()
-                .id(crime.getId())
-                .name(crime.getName())
-                .description(crime.getDescription())
-                .createdAt(crime.getCreatedAt())
-                .updatedAt(crime.getUpdatedAt())
-                .userId(crime.getUser().getId())
-                .build();
-    }
-    @Override
-    public CrimeDtoResponse saveCrime(CrimeDtoRequest crimeDtoRequest) {
+        CrimeDtoResponse crimeDtoResponse = getCrimeById(id);
 
-        boolean isCrime = crimeRepository.existsByName(crimeDtoRequest.getName());
-
-        if(isCrime){
-            throw new IllegalArgumentException();
+        if (!crimeDtoResponse.getName().equals(crimeDtoRequest.getName())) {
+            boolean crimeName = crimeRepository.existsByName(crimeDtoRequest.getName());
+            verifyExist.verify(crimeName, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CRIME);
         }
 
-        User user = userRepository.findById(crimeDtoRequest.getUserId()).orElseThrow(NullPointerException::new);
+        User user = verifyNotUser(crimeDtoRequest);
 
-        Crime crime = new Crime();
-
-        crime.setName(crimeDtoRequest.getName().toUpperCase());
-        crime.setDescription(crimeDtoRequest.getDescription());
-        crime.setCreatedAt(LocalDate.now());
-        crime.setUpdatedAt(LocalDate.now());
-        crime.setUser(user);
-
-        crimeRepository.save(crime);
-
-        return CrimeDtoResponse.builder()
-                .id(crime.getId())
-                .name(crime.getName())
-                .description(crime.getDescription())
-                .createdAt(crime.getCreatedAt())
-                .updatedAt(crime.getUpdatedAt())
-                .userId(crime.getUser().getId())
+        Crime crime = Crime.builder()
+                .id(crimeDtoResponse.getId())
+                .name(crimeDtoRequest.getName().toUpperCase())
+                .description(crimeDtoRequest.getDescription())
+                .createdAt(crimeDtoResponse.getCreatedAt())
+                .updatedAt(LocalDate.now())
+                .user(user)
                 .build();
-    }
 
-    @Override
-    public CrimeDtoResponse updateCrime(Long id, CrimeDtoRequest crimeDtoRequest) {
+        try {
+            crimeRepository.save(crime);
 
-        Crime crime = crimeRepository.findById(id).orElseThrow(NullPointerException::new);
-        User user = userRepository.findById(crimeDtoRequest.getUserId()).orElseThrow(IllegalArgumentException::new);
-
-        if (!Objects.equals(crimeDtoRequest.getName(), crime.getName())) {
-            boolean isCrime = crimeRepository.existsByName(crimeDtoRequest.getName());
-
-            if(isCrime){
-                throw new IllegalArgumentException();
-            }
+            return CrimeDtoResponse.builder()
+                    .id(crimeDtoResponse.getId())
+                    .name(crime.getName())
+                    .description(crime.getDescription())
+                    .createdAt(crime.getCreatedAt())
+                    .updatedAt(crime.getUpdatedAt())
+                    .userId(crime.getUser().getId())
+                    .build();
+        } catch (Exception e) {
+            throw new BadRequestExceptions(
+                    ErrorDtoResponse.builder()
+                            .message(ConstantService.BAD_REQUEST)
+                            .error(ConstantService.BAD_REQUEST)
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .date(LocalDateTime.now())
+                            .build()
+            );
         }
-
-        crime.setName(crimeDtoRequest.getName().toUpperCase());
-        crime.setDescription(crimeDtoRequest.getDescription());
-        crime.setUser(user);
-        crime.setUpdatedAt(LocalDate.now());
-
-        crimeRepository.save(crime);
-
-        return CrimeDtoResponse.builder()
-                .id(crime.getId())
-                .name(crime.getName())
-                .description(crime.getDescription())
-                .createdAt(crime.getCreatedAt())
-                .updatedAt(crime.getUpdatedAt())
-                .userId(crime.getUser().getId())
-                .build();
     }
 
     @Override
-    public void deleteCrime(Long id) throws IllegalArgumentExceptions {
+    public void deleteCrime(Long id) throws IllegalArgumentExceptions, BadRequestExceptions {
 
         boolean isCrime = crimeRepository.existsById(id);
 
@@ -144,11 +209,15 @@ public class CrimeServiceImpl implements ICrimeService {
 
         try {
             crimeRepository.deleteById(id);
-            if (!crimeRepository.existsById(id)) {
-                logger.info(ConstantService.MODEL_CRIME + " " + ConstantService.SUCCESSFULLY);
-            }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, format("{0} = {1} method {2}", ConstantService.VIOLATION_CONSTRAINT, e.getMessage(), DELETE_CRIME));
+           throw new BadRequestExceptions(
+                   ErrorDtoResponse.builder()
+                           .message(ConstantService.BAD_REQUEST)
+                           .error(ConstantService.BAD_REQUEST)
+                           .status(HttpStatus.BAD_REQUEST.value())
+                           .date(LocalDateTime.now())
+                           .build()
+           );
         }
     }
 
