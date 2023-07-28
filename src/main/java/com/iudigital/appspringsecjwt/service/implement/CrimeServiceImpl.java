@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +29,6 @@ public class CrimeServiceImpl implements ICrimeService {
     private static final String VERIFY_USER = "Verify User";
     VerifyNotExist verifyNotExist = new VerifyNotExist();
     VerifyExist verifyExist = new VerifyExist();
-    private static final Logger logger  = Logger.getLogger(CrimeServiceImpl.class.getName());
     private static final String VERIFY_CRIME = "Verify Crime";
 
     final 
@@ -153,7 +151,7 @@ public class CrimeServiceImpl implements ICrimeService {
 
         CrimeDtoResponse crimeDtoResponse = getCrimeById(id);
 
-        if (!crimeDtoResponse.getName().equals(crimeDtoRequest.getName())) {
+        if (!crimeDtoResponse.getName().toUpperCase().equals(crimeDtoRequest.getName().toUpperCase())) {
             boolean crimeName = crimeRepository.existsByName(crimeDtoRequest.getName());
             verifyExist.verify(crimeName, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CRIME);
         }

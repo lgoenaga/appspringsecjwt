@@ -103,11 +103,19 @@ public class CaseServiceImpl implements ICaseService {
     public CaseDtoResponse saveCase(CaseDtoRequest caseDtoRequest) throws IllegalArgumentExceptions, BadRequestExceptions {
 
         boolean userExist = userRepository.existsById(caseDtoRequest.getUser_id());
-        verifyNotExist.verify(userExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
 
         boolean crimeExist = crimeRepository.existsById(caseDtoRequest.getCrime_id());
-        verifyNotExist.verify(crimeExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
 
+        if (!userExist || !crimeExist) {
+            throw new IllegalArgumentExceptions(
+                    ErrorDtoResponse.builder()
+                            .message(ConstantService.INFO_NOT_FOUND)
+                            .error(ConstantService.NOT_FOUND)
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .date(LocalDateTime.now())
+                            .build()
+            );
+        }
 
         try {
             CaseDtoResponse caseUpdate = CaseDtoResponse.builder()

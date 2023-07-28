@@ -26,13 +26,26 @@ public class GeneralExceptions {
         );
     }
     public ResponseEntity<Object> getConflictException(Exception e){
-        message += ConstantService.ERROR + " = " + e.getMessage();
+        message += ConstantService.ILLEGAL_ARGUMENT + " = " + e.getMessage();
         logger.log(Level.SEVERE, message);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 ErrorDtoResponse.builder()
                         .error(ConstantService.VIOLATION_CONSTRAINT)
                         .message(e.getMessage())
                         .status(HttpStatus.CONFLICT.value())
+                        .date(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+    public ResponseEntity<Object> getBadRequestException(Exception e){
+        message += ConstantService.BAD_REQUEST + " = " + e.getMessage();
+        logger.log(Level.SEVERE, message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ErrorDtoResponse.builder()
+                        .error(ConstantService.BAD_REQUEST)
+                        .message(e.getMessage())
+                        .status(HttpStatus.BAD_REQUEST.value())
                         .date(LocalDateTime.now())
                         .build()
         );
