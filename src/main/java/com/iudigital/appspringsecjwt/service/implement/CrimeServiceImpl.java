@@ -33,14 +33,6 @@ public class CrimeServiceImpl implements ICrimeService {
     private static final Logger logger  = Logger.getLogger(CrimeServiceImpl.class.getName());
     private static final String VERIFY_CRIME = "Verify Crime";
 
-    private static final String DELETE_CRIME = "Crime Delete";
-
-    private static final String UPDATE_CRIME = "Crime Update";
-
-    private static final String SAVE_CRIME = "Crime Save";
-
-    private static final String GET_CRIME = "Crime Get";
-
     final 
     CrimeRepository crimeRepository;
     final

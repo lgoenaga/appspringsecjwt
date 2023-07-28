@@ -2,9 +2,12 @@ package com.iudigital.appspringsecjwt.controller;
 
 import com.iudigital.appspringsecjwt.dto.request.CaseDtoRequest;
 import com.iudigital.appspringsecjwt.dto.response.CaseDtoResponse;
+import com.iudigital.appspringsecjwt.exception.BadRequestExceptions;
+import com.iudigital.appspringsecjwt.exception.IllegalArgumentExceptions;
+import com.iudigital.appspringsecjwt.exception.NullPointerExceptions;
 import com.iudigital.appspringsecjwt.service.ConstantService;
 import com.iudigital.appspringsecjwt.service.implement.CaseServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
+import com.iudigital.appspringsecjwt.util.GeneralExceptions;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
@@ -25,86 +27,115 @@ public class CaseController {
     final
     CaseServiceImpl caseService;
 
+    GeneralExceptions generalExceptions= new GeneralExceptions();
+
+    private String message;
 
     @GetMapping
-    public ResponseEntity<List<CaseDtoResponse>> index() throws NullPointerException{
+    public ResponseEntity<Object> index(){
         try {
+            List<CaseDtoResponse> caseDtoResponseList = caseService.getAll();
             logger.info(ConstantService.MODEL_CASE + " " + ConstantService.INFO_FOUND);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(caseService.getAll());
-        } catch (NullPointerException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(caseDtoResponseList);
+        } catch (BadRequestExceptions e){
+            message = ConstantService.BAD_REQUEST + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    e.getErrorDtoResponse()
+            );
         } catch (Exception e) {
-            logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return generalExceptions.getConflictException(e);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CaseDtoResponse> show(@PathVariable("id") Long id) throws NullPointerException{
+    public ResponseEntity<Object> show(@PathVariable("id") Long id) {
         try {
-            logger.info(ConstantService.MODEL_CASE + " " + ConstantService.INFO_FOUND);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(caseService.getCaseById(id));
-        } catch (NullPointerException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            CaseDtoResponse caseDtoResponse = caseService.getCaseById(id);
+            message = ConstantService.MODEL_CASE + " " + ConstantService.INFO_FOUND;
+            logger.info(message);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(caseDtoResponse);
+        } catch (NullPointerExceptions e) {
+            message = ConstantService.NOT_FOUND + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    e.getErrorDtoResponse()
+            );
         } catch (Exception e) {
-            logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return generalExceptions.getGeneralException(e);
         }
     }
 
     @PostMapping
-    public ResponseEntity<String> store(@Valid @RequestBody CaseDtoRequest caseDtoRequest)throws IllegalArgumentException, NullPointerException{
+    public ResponseEntity<Object> store(@Valid @RequestBody CaseDtoRequest caseDtoRequest){
         try {
-            logger.info(ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY + " " + "\n" + caseService.saveCase(caseDtoRequest).toString()
+            CaseDtoResponse caseDtoResponse = caseService.saveCase(caseDtoRequest);
+            message = ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY;
+            logger.info(message);
+            return ResponseEntity.status(HttpStatus.CREATED).body(caseDtoResponse);
+        } catch (IllegalArgumentExceptions e) {
+            message = ConstantService.NOT_FOUND + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    e.getErrorDtoResponse()
             );
-        } catch (IllegalArgumentException e) {
-            logger.warning(ConstantService.BAD_REQUEST + " = " + e.getCause());
-            return ResponseEntity.badRequest().body(ConstantService.MODEL_CASE+ " " + ConstantService.BAD_REQUEST);
-        }  catch (NullPointerException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (BadRequestExceptions e){
+            message = ConstantService.BAD_REQUEST + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    e.getErrorDtoResponse()
+            );
         } catch (Exception e) {
-            logger.warning(ConstantService.ERROR + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return generalExceptions.getConflictException(e);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable("id") Long id, @Valid @RequestBody CaseDtoRequest caseDtoRequest) throws IllegalArgumentException, NullPointerException{
+    public ResponseEntity<Object> update(@PathVariable("id") Long id, @Valid @RequestBody CaseDtoRequest caseDtoRequest) {
         try {
-            logger.info(ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-                    ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY + " " + "\n" +
-                            caseService.updateCase(id, caseDtoRequest).toString()
+
+            CaseDtoResponse caseDtoResponse = caseService.updateCase(id, caseDtoRequest);
+            message = ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY;
+            logger.info(message);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(caseDtoResponse);
+        } catch (NullPointerExceptions | IllegalArgumentExceptions e) {
+            message = ConstantService.NOT_FOUND + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    e.getErrorDtoResponse()
             );
-        } catch (IllegalArgumentException e) {
-            logger.warning(ConstantService.BAD_REQUEST + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ConstantService.MODEL_CASE + " " + ConstantService.BAD_REQUEST);
-        }  catch (NullPointerException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ConstantService.MODEL_CASE + " " + ConstantService.NOT_FOUND);
+        } catch (BadRequestExceptions e){
+            message = ConstantService.BAD_REQUEST + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    e.getErrorDtoResponse()
+            );
         } catch (Exception e) {
-            logger.log(Level.SEVERE, String.format("%1$s = %2$s", ConstantService.ERROR, e.getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ConstantService.ERROR + " = " + e.getMessage());
+            return generalExceptions.getConflictException(e);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> destroy(@PathVariable("id") Long id) throws NullPointerException{
+    public ResponseEntity<Object> destroy(@PathVariable("id") Long id){
         try {
             caseService.deleteCase(id);
-            logger.info(ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY);
-        } catch (NullPointerException | EntityNotFoundException e) {
-            logger.warning(ConstantService.NOT_FOUND + " = " + e.getCause());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ConstantService.MODEL_CASE + " " + ConstantService.NOT_FOUND);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, String.format("%1$s = %2$s", ConstantService.ERROR, e.getMessage()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ConstantService.ERROR + " = " + e.getMessage());
+            message = ConstantService.MODEL_CASE + " " + ConstantService.SUCCESSFULLY;
+            logger.info(message);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(message);
+        } catch (IllegalArgumentExceptions e) {
+            message = ConstantService.NOT_FOUND + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    e.getErrorDtoResponse()
+            );
+        }  catch (BadRequestExceptions e){
+            message = ConstantService.BAD_REQUEST + " = " + e.getCause();
+            logger.warning(message);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    e.getErrorDtoResponse()
+            );
+        }catch (Exception e) {
+            return generalExceptions.getConflictException(e);
         }
     }
 
