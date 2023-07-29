@@ -4,6 +4,7 @@ import com.iudigital.appspringsecjwt.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,10 +36,16 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
                         authorize
-                            .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+
+                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/cases/**").permitAll()
+
                                 .requestMatchers("/users/**").hasRole(ROLE_ADMIN)
                                 .requestMatchers("/roles/**").hasRole(ROLE_ADMIN)
                                 .requestMatchers("/crimes/**").hasRole(ROLE_ADMIN)
+
                             .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
@@ -51,5 +58,6 @@ public class SecurityConfig{
 
 
     }
+
 
 }

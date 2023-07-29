@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -91,6 +92,7 @@ public class CaseController {
     }
 
     @PutMapping("/{id}")
+    @Secured({"ROLE_ADMIN"})
     public ResponseEntity<Object> update(@PathVariable("id") Long id, @Valid @RequestBody CaseDtoRequest caseDtoRequest) {
         try {
 
@@ -116,6 +118,7 @@ public class CaseController {
     }
 
     @DeleteMapping("/{id}")
+    @Secured({"ROLE_ADMIN"})
     public ResponseEntity<Object> destroy(@PathVariable("id") Long id){
         try {
             caseService.deleteCase(id);

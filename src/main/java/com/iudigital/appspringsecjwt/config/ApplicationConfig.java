@@ -1,6 +1,13 @@
 package com.iudigital.appspringsecjwt.config;
 
 import com.iudigital.appspringsecjwt.service.implement.UserServiceImpl;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +47,26 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return userService;
+    }
+
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI().addSecurityItem(new SecurityRequirement().
+                        addList("Bearer Authentication"))
+                .components(new Components().addSecuritySchemes
+                        ("Bearer Authentication", createAPIKeyScheme()))
+                .info(new Info().title("REST application Record of crime cases")
+                        .description("CRUD For registration of crimes, manages Users, Cases, Crimes and Roles.")
+                        .version("1.0").contact(new Contact().name("Luis Goenaga")
+                                .email( "luis.goenaga@est.iudigital.edu.co").url("http://www.technodeveloper.net"))
+                        .license(new License().name("License of API")
+                                .url("API license URL")));
+    }
+
+    private SecurityScheme createAPIKeyScheme() {
+        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                .bearerFormat("JWT")
+                .scheme("bearer");
     }
 
 }
