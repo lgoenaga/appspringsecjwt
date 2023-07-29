@@ -2,8 +2,11 @@ package com.iudigital.appspringsecjwt.exception;
 
 import com.iudigital.appspringsecjwt.dto.response.ErrorDtoResponse;
 
+import java.io.Serial;
+
 public class InternalServerExceptions extends RestExceptions{
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String codeError;

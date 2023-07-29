@@ -58,7 +58,7 @@ public class ApplicationConfig {
                 .info(new Info().title("REST application Record of crime cases")
                         .description("CRUD For registration of crimes, manages Users, Cases, Crimes and Roles.")
                         .version("1.0").contact(new Contact().name("Luis Goenaga")
-                                .email( "luis.goenaga@est.iudigital.edu.co").url("http://www.technodeveloper.net"))
+                                .email( "luis.goenaga@est.iudigital.edu.co").url("https://www.technodeveloper.net"))
                         .license(new License().name("License of API")
                                 .url("API license URL")));
     }
