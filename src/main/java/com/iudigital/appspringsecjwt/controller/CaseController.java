@@ -8,12 +8,18 @@ import com.iudigital.appspringsecjwt.exception.NullPointerExceptions;
 import com.iudigital.appspringsecjwt.service.ConstantService;
 import com.iudigital.appspringsecjwt.service.implement.CaseServiceImpl;
 import com.iudigital.appspringsecjwt.util.GeneralExceptions;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -21,6 +27,7 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/cases")
 @RequiredArgsConstructor
+@Tag(name = "Cases", description = "API Case Management")
 public class CaseController {
 
     Logger logger  = Logger.getLogger(CaseController.class.getName());
@@ -32,6 +39,17 @@ public class CaseController {
 
     private String message;
 
+    @Operation(
+            summary = "Retrieve all Cases",
+            description = "Get all cases.",
+            tags = { "Cases", "get" })
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", content = { @Content(schema = @Schema(implementation = CaseController.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", content = { @Content(schema = @Schema(implementation = CaseController.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "402", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "404", content = { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "409", content = { @Content(schema = @Schema(implementation = CaseController.class), mediaType = "application/json") }),
+            @ApiResponse(responseCode = "500", content = { @Content(schema = @Schema()) }) })
     @GetMapping
     public ResponseEntity<Object> index(){
         try {

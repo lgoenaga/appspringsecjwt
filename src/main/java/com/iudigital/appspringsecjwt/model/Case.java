@@ -40,13 +40,13 @@ public class Case implements Serializable{
 
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    //@Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+   // @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JoinColumn(name = "crime_id", nullable = false)
     private Crime crime;
 

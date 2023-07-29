@@ -178,13 +178,13 @@ public class CaseServiceImpl implements ICaseService {
     public CaseDtoResponse updateCase(Long id, CaseDtoRequest caseDtoRequest) throws IllegalArgumentExceptions, NullPointerExceptions, BadRequestExceptions {
 
         boolean caseExist = caseRepository.existsById(id);
-        verifyExist.verify(caseExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
+       // verifyExist.verify(caseExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
 
         boolean userExist = userRepository.existsById(caseDtoRequest.getUser_id());
-        verifyExist.verify(userExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
+       // verifyExist.verify(userExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
 
         boolean crimeExist = crimeRepository.existsById(caseDtoRequest.getCrime_id());
-        verifyExist.verify(crimeExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
+        //verifyExist.verify(crimeExist, ConstantService.INFO_FOUND + ConstantService.METHOD + VERIFY_CASE);
 
 
         Case caseCrime = caseRepository.findById(id).orElseThrow(
@@ -247,11 +247,11 @@ public class CaseServiceImpl implements ICaseService {
     @Override
     public void deleteCase(Long id) throws IllegalArgumentExceptions, BadRequestExceptions {
 
-        verifyExist = new VerifyExist();
+     //   verifyExist = new VerifyExist();
 
-        boolean caseExist = caseRepository.existsById(id);
+       // boolean caseExist = caseRepository.existsById(id);
 
-        verifyNotExist.verify(caseExist, ConstantService.NOT_ID + " method " + VERIFY_CASE);
+      //  verifyNotExist.verify(caseExist, ConstantService.NOT_ID + " method " + VERIFY_CASE);
 
         try {
             caseRepository.deleteById(id);
